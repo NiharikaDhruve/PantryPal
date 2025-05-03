@@ -1,1 +1,3 @@
-Collaborators: ameliavenales, 404-CaitlinCR, Evelyn Nguyen
+- Collaborators: ameliavenales, 404-CaitlinCR, Evelyn Nguyen
+- Static holds images and css files
+- Templates holds html files
