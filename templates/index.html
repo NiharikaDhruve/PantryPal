@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Pantry Pals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='plantPals.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='PantryPalLogo.png') }}">
+</head>
+<body>
+    <img src="{{ url_for('static', filename='PantryPalLogo.png') }}" style="width:150px; height:150px;"> 
+    <header>
+        <div class="nav">
+            <a href="{{ url_for('home') }}">Pantry Pal</a>
+
+            <!-- make home into a quick link to the homepage -->
+            <a href="{{ url_for('recipe_book') }}">Recipe Book</a>
+            <a href="{{ url_for('recomendations') }}">Recomendations</a>
+            <a href="{{ url_for('support') }}">Support</a>
+        </div>
+    </header>
+    <body>
+
+    <div class="interface">
+        <div class="userInput">
+            <form method="post" action="/generate">
+                <label for="ingredients">Enter ingredients (comma-separated):</label><br>
+                <input type="text" id="ingredients" name="ingredients" required>
+                <button type="submit">Generate Recipe</button>
+            </form>
+        </div>
+
+        <div class="chatBox" id="output">
+            <!-- Streaming output will go here -->
+        </div>
+    </div>
+
+    <script>
+        const form = document.querySelector("form");
+        const outputDiv = document.getElementById("output");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            outputDiv.innerHTML = "<p>Generating...</p>";
+
+            fetch("/generate", {
+                method: "POST",
+                body: new FormData(form),
+            }).then(response => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+
+                function readChunk() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) return;
+                        const chunk = decoder.decode(value, { stream: true });
+                        outputDiv.innerHTML += chunk;
+                        readChunk();
+                    });
+                }
+
+                readChunk();
+            });
+        });
+    </script>
+</body>
+</html>
